@@ -1,0 +1,8 @@
+# requirements.yml
+
+roles:
+  # Miniconda
+  - src: galaxyproject.miniconda
+
+  # Quarto
+  - src: Appsilon.quarto

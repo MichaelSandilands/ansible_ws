@@ -1,0 +1,83 @@
+---
+# 1. Ensure ~/.ssh directory exists with correct permissions
+- name: Ensure .ssh directory exists
+  ansible.builtin.file:
+    path: "{{ ssh_dir }}"
+    state: directory
+    owner: "{{ ssh_user }}"
+    group: "{{ ssh_user }}"
+    mode: "0700"
+
+# 2. Deploy SSH config
+- name: Deploy SSH config files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ ssh_dir }}/{{ item }}"
+    owner: "{{ ssh_user }}"
+    group: "{{ ssh_user }}"
+    mode: "0600"
+  loop: "{{ ssh_config_files }}"
+
+# 3. Deploy public keys
+- name: Deploy SSH public keys
+  ansible.builtin.copy:
+    src: "{{ item.public }}"
+    dest: "{{ ssh_dir }}/{{ item.public }}"
+    owner: "{{ ssh_user }}"
+    group: "{{ ssh_user }}"
+    mode: "0644"
+  loop: "{{ ssh_keys }}"
+  loop_control:
+    label: "{{ item.public }}"
+
+# 4. Deploy vault-encrypted private keys
+- name: Deploy SSH private keys (vault-encrypted)
+  ansible.builtin.copy:
+    src: "{{ item.private }}"
+    dest: "{{ ssh_dir }}/{{ item.private }}"
+    owner: "{{ ssh_user }}"
+    group: "{{ ssh_user }}"
+    mode: "0600"
+  loop: "{{ ssh_keys }}"
+  loop_control:
+    label: "{{ item.private }}"
+  no_log: true
+
+# 5. Configure git identity
+- name: Set git user.name
+  community.general.git_config:
+    name: user.name
+    value: "{{ git_user_name }}"
+    scope: global
+  become: true
+  become_user: "{{ ssh_user }}"
+  when: git_user_name | length > 0
+
+- name: Set git user.email
+  community.general.git_config:
+    name: user.email
+    value: "{{ git_user_email }}"
+    scope: global
+  become: true
+  become_user: "{{ ssh_user }}"
+  when: git_user_email | length > 0
+
+- name: Set git default branch
+  community.general.git_config:
+    name: init.defaultBranch
+    value: main
+    scope: global
+  become: true
+  become_user: "{{ ssh_user }}"
+
+- name: Set git SSH signing for commits
+  community.general.git_config:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    scope: global
+  become: true
+  become_user: "{{ ssh_user }}"
+  loop: "{{ git_ssh_signing }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when: git_ssh_signing is defined

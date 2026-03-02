@@ -1,0 +1,20 @@
+---
+# User to configure SSH for
+ssh_user: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+ssh_home: "/home/{{ ssh_user }}"
+ssh_dir: "{{ ssh_home }}/.ssh"
+
+# Git identity
+git_user_name: "MichaelSandilands"
+git_user_email: "michael.b.sandilands@gmail.com"
+
+# List of SSH key pairs to deploy
+# Each entry should have:
+#   - name:    key filename stem (e.g. id_ed25519_github)
+#   - public:  filename in files/ (e.g. id_ed25519_github.pub)
+#   - private: vault-encrypted filename in files/ (e.g. id_ed25519_github)
+ssh_keys: []
+
+# SSH config file to deploy (filename in files/)
+ssh_config_files:
+  - config

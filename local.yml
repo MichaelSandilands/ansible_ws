@@ -1,0 +1,148 @@
+---
+- name: Provision Local Tuxedo Computer (Fedora)
+  hosts: localhost
+  become: true
+  vars:
+    # Ensures we target your actual user even when running with sudo
+    target_user: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+    target_home: "/home/{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+    fedora_version: "{{ ansible_distribution_major_version }}"
+
+  pre_tasks:
+    - name: Update all system packages
+      ansible.builtin.dnf:
+        name: "*"
+        state: latest
+        update_cache: true
+
+    - name: Add Tuxedo Computers repository
+      ansible.builtin.get_url:
+        url: "https://rpm.tuxedocomputers.com/fedora/tuxedo.repo"
+        dest: /etc/yum.repos.d/tuxedo.repo
+        mode: '0644'
+
+    - name: Import Tuxedo Computers GPG key
+      ansible.builtin.rpm_key:
+        key: "https://rpm.tuxedocomputers.com/fedora/0x54840598.pub.asc"
+        state: present
+
+    - name: Add Docker CE repository
+      ansible.builtin.get_url:
+        url: "https://download.docker.com/linux/fedora/docker-ce.repo"
+        dest: /etc/yum.repos.d/docker-ce.repo
+        mode: '0644'
+
+    - name: Import RPM Fusion GPG keys
+      ansible.builtin.rpm_key:
+        key: "{{ item }}"
+        state: present
+      loop:
+        - "https://rpmfusion.org/keys?action=AttachFile&do=get&target=RPM-GPG-KEY-rpmfusion-free-fedora-{{ fedora_version }}"
+        - "https://rpmfusion.org/keys?action=AttachFile&do=get&target=RPM-GPG-KEY-rpmfusion-nonfree-fedora-{{ fedora_version }}"
+
+    - name: Install RPM Fusion repositories
+      ansible.builtin.dnf:
+        name:
+          - "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ fedora_version }}.noarch.rpm"
+          - "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ fedora_version }}.noarch.rpm"
+        state: present
+
+  tasks:
+    - name: Install System and Dev Packages
+      ansible.builtin.dnf:
+        state: present
+        name:
+          # Tuxedo Specific
+          - tuxedo-control-center
+          # Terminal & Fonts
+          - cascadia-mono-nf-fonts
+          - kitty
+          - powerline
+          # Neovim & Dependencies
+          - neovim
+          - python3-neovim
+          - luarocks
+          - ImageMagick
+          - compat-lua
+          # Nvidia (Drivers + CUDA for Data Science)
+          - akmod-nvidia
+          # - xorg-x11-drv-nvidia-cuda
+          # Docker
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+          # R Core & RStudio
+          - R
+          - rstudio
+          # R: Tidyverse / Dev Dependencies
+          - openssl-devel
+          - libcurl-devel
+          - libxml2-devel
+          - fontconfig-devel
+          - harfbuzz-devel
+          - fribidi-devel
+          - freetype-devel
+          - libpng-devel
+          - libtiff-devel
+          - libjpeg-turbo-devel
+          - cmake
+          - gcc-c++
+          # R: Geospatial (sf/terra)
+          - gdal-devel
+          - proj-devel
+          - geos-devel
+          - sqlite-devel
+          - udunits2-devel
+          # R: Prophet/V8
+          - v8-devel
+          # Gaming
+          - steam
+
+    - name: Configure Docker Service
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Add user to docker group
+      ansible.builtin.user:
+        name: "{{ target_user }}"
+        groups: docker
+        append: true
+
+    - name: Install R packages for user
+      ansible.builtin.command:
+        cmd: >
+          Rscript -e "
+            pkgs <- c('tidyverse', 'tidymodels', 'modeltime', 'timetk');
+            missing <- pkgs[!pkgs %in% installed.packages()[,'Package']];
+            if (length(missing)) install.packages(missing, repos='https://cloud.r-project.org')
+          "
+      become_user: "{{ target_user }}"
+      register: r_install
+      changed_when: "'installing' in (r_install.stderr | lower)"
+
+  roles:
+    - role: galaxyproject.miniconda
+      vars:
+        miniconda_prefix: "{{ target_home }}/miniconda3"
+        miniconda_manage_dependencies: false
+      become_user: "{{ target_user }}"
+
+    - role: Appsilon.quarto
+
+    - role: ssh_keys
+      vars:
+        ssh_user: "{{ target_user }}"
+        git_user_name: "MichaelSandilands"
+        git_user_email: "michael.b.sandilands@gmail.com"
+        ssh_keys:
+          - name: github_key
+            public: github_key.pub
+            private: github_key
+          # - name: id_ed25519_ec2
+          #   public: id_ed25519_ec2.pub
+          #   private: id_ed25519_ec2
+
