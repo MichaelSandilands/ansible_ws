@@ -52,7 +52,6 @@
       ansible.builtin.command:
         cmd: dnf config-manager setopt fedora-cisco-openh264.enabled=1
 
-  tasks:
     - name: Install System and Dev Packages
       ansible.builtin.dnf:
         state: present
@@ -107,6 +106,8 @@
           # System Utilities
           - stow
 
+
+  tasks:
     - name: Configure Docker Service
       ansible.builtin.systemd:
         name: docker
