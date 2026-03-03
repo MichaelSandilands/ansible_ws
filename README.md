@@ -8,11 +8,13 @@ Run the following commands to provision your local machine:
 
 ```bash
 # 1. Install Ansible
-sudo dnf install ansible -y
+sudo dnf install ansible git -y
 
 # 2. Install Ansible-Galaxy roles
 # This fetches the external dependencies (like Miniconda and Starship)
-ansible-galaxy install -r https://raw.githubusercontent.com/MichaelSandilands/ansible_ws/main/requirements.yml
+curl -L -o temp_requirements.yml "https://raw.githubusercontent.com/MichaelSandilands/ansible_ws/main/requirements.yml"
+ansible-galaxy install -r temp_requirements.yml
+rm temp_requirements.yml
 
 # 3. Provision Machine
 # Pulls this repository and executes the local.yml playbook
