@@ -79,7 +79,6 @@
           - docker-compose-plugin
           # R Core & RStudio
           - R
-          - rstudio
           # R: Tidyverse / Dev Dependencies
           - openssl-devel
           - libcurl-devel
