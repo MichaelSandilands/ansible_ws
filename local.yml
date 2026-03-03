@@ -46,7 +46,7 @@
 
     - name: Install System and Dev Packages
       ansible.builtin.dnf:
-        state: present
+        state: latest
         name:
           # Tuxedo Specific
           - tuxedo-control-center
@@ -96,7 +96,7 @@
           - steam
           # System Utilities
           - stow
-        update_cache: yes
+        update_cache: true
 
 
   tasks:
