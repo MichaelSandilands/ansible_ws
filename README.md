@@ -12,11 +12,11 @@ sudo dnf install ansible -y
 
 # 2. Install Ansible-Galaxy roles
 # This fetches the external dependencies (like Miniconda and Starship)
-ansible-galaxy install -r [https://raw.githubusercontent.com/MichaelSandilands/ansible_ws/main/requirements.yml](https://raw.githubusercontent.com/MichaelSandilands/ansible_ws/main/requirements.yml)
+ansible-galaxy install -r https://raw.githubusercontent.com/MichaelSandilands/ansible_ws/main/requirements.yml
 
 # 3. Provision Machine
 # Pulls this repository and executes the local.yml playbook
-ansible-pull -U "[https://github.com/MichaelSandilands/ansible_ws.git](https://github.com/MichaelSandilands/ansible_ws.git)" -K
+ansible-pull -U "https://github.com/MichaelSandilands/ansible_ws.git" -K
 ```
 
 Note: You will be prompted for your sudo password (-K) and the Ansible Vault password (configured in ansible.cfg) to decrypt sensitive data like SSH keys.
