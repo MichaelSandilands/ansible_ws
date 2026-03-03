@@ -127,18 +127,18 @@
         group: "{{ target_user }}"
         mode: '0755'
 
-    - name: Install R packages for user
-      ansible.builtin.command:
-        cmd: >
-          Rscript -e "
-            .libPaths(c('~/R/library', .libPaths()));
-            pkgs <- c('tidyverse', 'tidymodels', 'modeltime', 'timetk');
-            missing <- pkgs[!pkgs %in% installed.packages()[,'Package']];
-            if (length(missing)) install.packages(missing, repos='https://cloud.r-project.org', lib='~/R/library')
-          "
-      become_user: "{{ target_user }}"
-      register: r_install
-      changed_when: "'installing' in (r_install.stderr | lower)"
+    # - name: Install R packages for user
+    #   ansible.builtin.command:
+    #     cmd: >
+    #       Rscript -e "
+    #         .libPaths(c('~/R/library', .libPaths()));
+    #         pkgs <- c('tidyverse', 'tidymodels', 'modeltime', 'timetk');
+    #         missing <- pkgs[!pkgs %in% installed.packages()[,'Package']];
+    #         if (length(missing)) install.packages(missing, repos='https://cloud.r-project.org', lib='~/R/library')
+    #       "
+    #   become_user: "{{ target_user }}"
+    #   register: r_install
+    #   changed_when: "'installing' in (r_install.stderr | lower)"
 
   roles:
     - role: galaxyproject.miniconda
