@@ -32,14 +32,6 @@
         dest: /etc/yum.repos.d/docker-ce.repo
         mode: '0644'
 
-    # - name: Import RPM Fusion GPG keys
-    #   ansible.builtin.rpm_key:
-    #     key: "{{ item }}"
-    #     state: present
-    #   loop:
-    #     - "https://rpmfusion.org/keys?action=AttachFile&do=get&target=RPM-GPG-KEY-rpmfusion-free-fedora-{{ fedora_version }}"
-    #     - "https://rpmfusion.org/keys?action=AttachFile&do=get&target=RPM-GPG-KEY-rpmfusion-nonfree-fedora-{{ fedora_version }}"
-
     - name: Install RPM Fusion repositories
       ansible.builtin.dnf:
         name:
@@ -104,6 +96,7 @@
           - steam
           # System Utilities
           - stow
+        update_cache: yes
 
 
   tasks:
