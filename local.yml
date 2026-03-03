@@ -47,6 +47,10 @@
           - "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ fedora_version }}.noarch.rpm"
         state: present
 
+    - name: Enable fedora-cisco-openh264 repository
+      ansible.builtin.command:
+        cmd: dnf config-manager --set-enabled fedora-cisco-openh264
+
   tasks:
     - name: Install System and Dev Packages
       ansible.builtin.dnf:
@@ -57,7 +61,7 @@
           # Terminal & Fonts
           - cascadia-mono-nf-fonts
           - kitty
-          - powerline
+          - tmux
           # Neovim & Dependencies
           - neovim
           - python3-neovim
@@ -99,6 +103,8 @@
           - v8-devel
           # Gaming
           - steam
+          # System Utilities
+          - stow
 
     - name: Configure Docker Service
       ansible.builtin.systemd:
@@ -112,13 +118,22 @@
         groups: docker
         append: true
 
+    - name: Ensure R user library exists
+      ansible.builtin.file:
+        path: "{{ target_home }}/R/library"
+        state: directory
+        owner: "{{ target_user }}"
+        group: "{{ target_user }}"
+        mode: '0755'
+
     - name: Install R packages for user
       ansible.builtin.command:
         cmd: >
           Rscript -e "
+            .libPaths(c('~/R/library', .libPaths()));
             pkgs <- c('tidyverse', 'tidymodels', 'modeltime', 'timetk');
             missing <- pkgs[!pkgs %in% installed.packages()[,'Package']];
-            if (length(missing)) install.packages(missing, repos='https://cloud.r-project.org')
+            if (length(missing)) install.packages(missing, repos='https://cloud.r-project.org', lib='~/R/library')
           "
       become_user: "{{ target_user }}"
       register: r_install
@@ -146,3 +161,4 @@
           #   public: id_ed25519_ec2.pub
           #   private: id_ed25519_ec2
 
+    - role: dotfiles

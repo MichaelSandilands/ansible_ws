@@ -1,0 +1,59 @@
+---
+# 1. Clone your dotfiles repository
+- name: Clone dotfiles repository
+  ansible.builtin.git:
+    repo: "https://github.com/MichaelSandilands/dotfiles.git"
+    dest: "{{ target_home }}/dotfiles"
+    update: true
+  become_user: "{{ target_user }}"
+
+# 2. Use Stow to symlink the configurations
+- name: Stow dotfiles (kitty, nvim, tmux)
+  ansible.builtin.command:
+    cmd: "stow -t {{ target_home }} {{ item }}"
+    chdir: "{{ target_home }}/dotfiles"
+  loop:
+    - kitty
+    - nvim
+    - tmux
+  become_user: "{{ target_user }}"
+  changed_when: false # Stow handles idempotency internally
+
+# 3. Install Tmux Plugin Manager (TPM)
+- name: Ensure tmux plugin manager (tpm) is cloned
+  ansible.builtin.git:
+    repo: "https://github.com/tmux-plugins/tpm"
+    dest: "{{ target_home }}/.tmux/plugins/tpm"
+    update: true
+  become_user: "{{ target_user }}"
+
+# 4. Headlessly install tmux plugins
+- name: Install tmux plugins headlessly
+  ansible.builtin.command:
+    cmd: "{{ target_home }}/.tmux/plugins/tpm/bin/install_plugins"
+  become_user: "{{ target_user }}"
+  environment:
+    # Set the environment variable so TPM knows where to install
+    TMUX_PLUGIN_MANAGER_PATH: "{{ target_home }}/.tmux/plugins/"
+  register: tpm_install
+  changed_when: "'Installing' in tpm_install.stdout or 'download success' in tpm_install.stdout"
+
+# 5. Check if the Neovim Conda environment already exists
+- name: Check if nvim_provider conda env exists
+  ansible.builtin.stat:
+    path: "{{ target_home }}/miniconda3/envs/nvim_provider"
+  register: nvim_env
+
+# 6. Create or update the Neovim Conda environment
+- name: Create nvim_provider conda env
+  ansible.builtin.command:
+    cmd: "{{ target_home }}/miniconda3/bin/conda env create -f {{ target_home }}/dotfiles/conda/nvim_provider.yml"
+  become_user: "{{ target_user }}"
+  when: not nvim_env.stat.exists
+
+- name: Update nvim_provider conda env (if exists)
+  ansible.builtin.command:
+    cmd: "{{ target_home }}/miniconda3/bin/conda env update -f {{ target_home }}/dotfiles/conda/nvim_provider.yml --prune"
+  become_user: "{{ target_user }}"
+  when: nvim_env.stat.exists
+  changed_when: false
