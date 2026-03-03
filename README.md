@@ -39,7 +39,7 @@ Used for "pull-mode" deployment where the target machine pulls the configuration
 
 - `-K`: (Ask-become-pass) Prompts for your sudo password so Ansible can install system packages.
 
-Post-Installation Notes
+## Post-Installation Notes
 
 1. Reboot
 
