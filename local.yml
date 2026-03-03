@@ -80,26 +80,26 @@
           # R Core & RStudio
           - R
           # R: Tidyverse / Dev Dependencies
-          - openssl-devel
-          - libcurl-devel
-          - libxml2-devel
-          - fontconfig-devel
-          - harfbuzz-devel
-          - fribidi-devel
-          - freetype-devel
-          - libpng-devel
-          - libtiff-devel
-          - libjpeg-turbo-devel
-          - cmake
-          - gcc-c++
+          # - openssl-devel
+          # - libcurl-devel
+          # - libxml2-devel
+          # - fontconfig-devel
+          # - harfbuzz-devel
+          # - fribidi-devel
+          # - freetype-devel
+          # - libpng-devel
+          # - libtiff-devel
+          # - libjpeg-turbo-devel
+          # - cmake
+          # - gcc-c++
           # R: Geospatial (sf/terra)
-          - gdal-devel
-          - proj-devel
-          - geos-devel
-          - sqlite-devel
-          - udunits2-devel
+          # - gdal-devel
+          # - proj-devel
+          # - geos-devel
+          # - sqlite-devel
+          # - udunits2-devel
           # R: Prophet/V8
-          - v8-devel
+          # - v8-devel
           # Gaming
           - steam
           # System Utilities
