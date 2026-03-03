@@ -57,3 +57,26 @@
   become_user: "{{ target_user }}"
   when: nvim_env.stat.exists
   changed_when: false
+
+# 7. Initialize Starship in .bashrc (if not already present)
+- name: Add Starship initialization to .bashrc
+  ansible.builtin.lineinfile:
+    path: "{{ target_home }}/.bashrc"
+    line: 'eval "$(starship init bash)"'
+    state: present
+    create: yes
+  become_user: "{{ target_user }}"
+
+# 8. Initialize Conda for the user shell
+- name: Check if Conda is already initialized in .bashrc
+  ansible.builtin.shell: grep -q "conda initialize" {{ target_home }}/.bashrc
+  register: conda_init_check
+  failed_when: false
+  changed_when: false
+  become_user: "{{ target_user }}"
+
+- name: Run conda init bash
+  ansible.builtin.command:
+    cmd: "{{ target_home }}/miniconda3/bin/conda init bash"
+  become_user: "{{ target_user }}"
+  when: conda_init_check.rc != 0

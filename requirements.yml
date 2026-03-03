@@ -6,3 +6,6 @@ roles:
 
   # Quarto
   - src: Appsilon.quarto
+
+  # Starship Propmt
+  - src: andrewrothstein.starship

@@ -161,4 +161,9 @@
           #   public: id_ed25519_ec2.pub
           #   private: id_ed25519_ec2
 
+    - role: andrewrothstein.starship
+
     - role: dotfiles
+
+    - role: auto_updates
+
