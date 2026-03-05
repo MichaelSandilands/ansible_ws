@@ -54,8 +54,13 @@
         - "/etc/pki/rpm-gpg/RPM-GPG-KEY-rpmfusion-nonfree-fedora-{{ fedora_version }}"
 
     - name: Enable fedora-cisco-openh264 repository
-      ansible.builtin.command:
-        cmd: dnf config-manager setopt fedora-cisco-openh264.enabled=1
+      community.general.ini_file:
+        path: /etc/yum.repos.d/fedora-cisco-openh264.repo
+        section: fedora-cisco-openh264
+        option: enabled
+        value: "1"
+        mode: '0644'
+        no_extra_spaces: true
 
     - name: Install System and Dev Packages
       ansible.builtin.dnf:
