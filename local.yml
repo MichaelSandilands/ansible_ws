@@ -68,6 +68,8 @@
         name:
           # Tuxedo Specific
           - tuxedo-control-center
+          - tuxedo-drivers
+          - tuxedo-tomte-light
           # Terminal & Fonts
           - cascadia-mono-nf-fonts
           - kitty
