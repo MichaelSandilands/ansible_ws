@@ -7,6 +7,7 @@ This repository contains Ansible playbooks and roles to automate the setup of a 
 Run the following commands to provision your local machine:
 
 ```bash
+sudo dnf upgrade -y
 # 1. Install Ansible
 sudo dnf install ansible git -y
 
