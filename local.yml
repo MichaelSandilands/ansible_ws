@@ -153,6 +153,11 @@
     #   register: r_install
     #   changed_when: "'installing' in (r_install.stderr | lower)"
 
+    - name: Install devcontainer CLI globally
+      community.general.npm:
+        name: "@devcontainers/cli"
+        global: true
+
   roles:
     - role: galaxyproject.miniconda
       vars:
