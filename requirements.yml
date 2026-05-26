@@ -2,7 +2,7 @@
 
 roles:
   # Miniconda
-  - src: galaxyproject.miniconda
+  # - src: galaxyproject.miniconda
 
   # Quarto
   - src: Appsilon.quarto

@@ -19,7 +19,7 @@
       ansible.builtin.get_url:
         url: "https://rpm.tuxedocomputers.com/fedora/tuxedo.repo"
         dest: /etc/yum.repos.d/tuxedo.repo
-        mode: '0644'
+        mode: "0644"
 
     - name: Import Tuxedo Computers GPG key
       ansible.builtin.rpm_key:
@@ -30,7 +30,7 @@
       ansible.builtin.get_url:
         url: "https://download.docker.com/linux/fedora/docker-ce.repo"
         dest: /etc/yum.repos.d/docker-ce.repo
-        mode: '0644'
+        mode: "0644"
 
     - name: Import Docker CE GPG key
       ansible.builtin.rpm_key:
@@ -59,7 +59,7 @@
         section: fedora-cisco-openh264
         option: enabled
         value: "1"
-        mode: '0644'
+        mode: "0644"
         no_extra_spaces: true
 
     - name: Install System and Dev Packages
@@ -82,15 +82,17 @@
           - compat-lua
           # Nvidia (Drivers + CUDA for Data Science)
           - akmod-nvidia
-          # - xorg-x11-drv-nvidia-cuda
+          - xorg-x11-drv-nvidia-cuda
           # Docker
           - docker-ce
           - docker-ce-cli
           - containerd.io
           - docker-buildx-plugin
           - docker-compose-plugin
-          # R Core & RStudio
-          - R
+          # Python Package Manager
+          - uv
+          # R Core
+          # - R
           # R: Tidyverse / Dev Dependencies
           # - openssl-devel
           # - libcurl-devel
@@ -118,7 +120,6 @@
           - stow
         update_cache: true
 
-
   tasks:
     - name: Configure Docker Service
       ansible.builtin.systemd:
@@ -132,13 +133,13 @@
         groups: docker
         append: true
 
-    - name: Ensure R user library exists
-      ansible.builtin.file:
-        path: "{{ target_home }}/R/library"
-        state: directory
-        owner: "{{ target_user }}"
-        group: "{{ target_user }}"
-        mode: '0755'
+    # - name: Ensure R user library exists
+    #   ansible.builtin.file:
+    #     path: "{{ target_home }}/R/library"
+    #     state: directory
+    #     owner: "{{ target_user }}"
+    #     group: "{{ target_user }}"
+    #     mode: "0755"
 
     # - name: Install R packages for user
     #   ansible.builtin.command:
@@ -159,11 +160,11 @@
         global: true
 
   roles:
-    - role: galaxyproject.miniconda
-      vars:
-        miniconda_prefix: "{{ target_home }}/miniconda3"
-        miniconda_manage_dependencies: false
-      become_user: "{{ target_user }}"
+    # - role: galaxyproject.miniconda
+    #   vars:
+    #     miniconda_prefix: "{{ target_home }}/miniconda3"
+    #     miniconda_manage_dependencies: false
+    #   become_user: "{{ target_user }}"
 
     - role: Appsilon.quarto
 
@@ -185,4 +186,3 @@
     - role: dotfiles
 
     - role: auto_updates
-
