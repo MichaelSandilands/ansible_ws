@@ -60,14 +60,14 @@ rather than the entire dictionary for each iteration.
 
 ## Role Variables
 
-| Variable           | Description                          | Default    |
-|--------------------|--------------------------------------|------------|
-| `ssh_user`         | Target username                      | detected   |
-| `git_user_name`    | Git global user.name                 | `""`       |
-| `git_user_email`   | Git global user.email                | `""`       |
-| `ssh_keys`         | List of key pairs to deploy          | `[]`       |
-| `ssh_config_files` | List of config files to deploy       | `[config]` |
-| `git_ssh_signing`  | Optional list of git signing config  | undefined  |
+| Variable           | Description                         | Default    |
+| ------------------ | ----------------------------------- | ---------- |
+| `ssh_user`         | Target username                     | detected   |
+| `git_user_name`    | Git global user.name                | `""`       |
+| `git_user_email`   | Git global user.email               | `""`       |
+| `ssh_keys`         | List of key pairs to deploy         | `[]`       |
+| `ssh_config_files` | List of config files to deploy      | `[config]` |
+| `git_ssh_signing`  | Optional list of git signing config | undefined  |
 
 ## Usage in Playbook
 
@@ -89,13 +89,13 @@ roles:
 
 ## What Gets Deployed
 
-| File                    | Permissions | Notes                         |
-|-------------------------|-------------|-------------------------------|
-| `~/.ssh/`               | `0700`      | Directory                     |
-| `~/.ssh/config`         | `0600`      | SSH host configuration        |
-| `~/.ssh/*.pub`          | `0644`      | Public keys (readable)        |
-| `~/.ssh/*` (private)    | `0600`      | Private keys (owner-only)     |
-| `~/.gitconfig`          | n/a         | Managed via git_config module |
+| File                 | Permissions | Notes                         |
+| -------------------- | ----------- | ----------------------------- |
+| `~/.ssh/`            | `0700`      | Directory                     |
+| `~/.ssh/config`      | `0600`      | SSH host configuration        |
+| `~/.ssh/*.pub`       | `0644`      | Public keys (readable)        |
+| `~/.ssh/*` (private) | `0600`      | Private keys (owner-only)     |
+| `~/.gitconfig`       | n/a         | Managed via git_config module |
 
 ## Running the Playbook
 
@@ -106,14 +106,8 @@ installation. The full bootstrap process is:
 # Install ansible
 sudo dnf install ansible -y
 
-# Install ansible-galaxy roles
-curl -L -o temp_requirements.yml \
-  "https://raw.githubusercontent.com/MichaelSandilands/ansible_tuxedo/refs/heads/main/requirements.yml"
-ansible-galaxy install -r temp_requirements.yml
-rm temp_requirements.yml
-
 # Provision Machine
-ansible-pull -U "https://github.com/MichaelSandilands/ansible_tuxedo.git" -K
+ansible-pull -U "https://github.com/MichaelSandilands/ansible_ws.git" -K
 
 # Reboot after first provision
 # reboot
