@@ -1,5 +1,5 @@
 ---
-- name: Restart dnf-automatic
+- name: Restart dnf5-automatic timer
   ansible.builtin.systemd:
-    name: dnf-automatic.timer
+    name: dnf5-automatic.timer
     state: restarted

@@ -48,15 +48,11 @@ It is highly recommended to reboot after the first successful provision, especia
 
 2. Neovim & Molten Issues
 
-If you encounter issues with the Molten or Quarto plugins:
-
-1. Open Neovim.
-2. Run `:UpdateRemotePlugins`.
-3. Restart Neovim.
+See my [dotfiles repo](https://github.com/MichaelSandilands/dotfiles.git)
 
 ## Role Overview
 
-- **auto_updates**: Configures `dnf-automatic` for hands-off system patching.
+- **auto_updates**: Configures `dnf5-automatic` for hands-off system patching.
 - **dotfiles**: Clones your dotfiles repo, uses `stow` for symlinking, and initializes the Starship prompt/Conda shell.
 - **ssh_keys**: Securely deploys SSH private/public keys and configurations from encrypted vault files.
-- **External Roles**: Includes `starship` for the shell prompt and `miniconda` for Python environment management.
+- **External Roles**: Includes `starship` for the shell prompt.

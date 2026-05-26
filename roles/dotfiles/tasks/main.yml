@@ -38,27 +38,37 @@
   register: tpm_install
   changed_when: "'Installing' in tpm_install.stdout or 'download success' in tpm_install.stdout"
 
-# 5. Check if the Neovim Conda environment already exists
-- name: Check if nvim_provider conda env exists
-  ansible.builtin.stat:
-    path: "{{ target_home }}/miniconda3/envs/nvim_provider"
-  register: nvim_env
-
-# 6. Create or update the Neovim Conda environment
-- name: Create nvim_provider conda env
-  ansible.builtin.command:
-    cmd: "{{ target_home }}/miniconda3/bin/conda env create -f {{ target_home }}/dotfiles/conda/nvim_provider.yml"
+# 5. Create the Neovim Python provider venv and install its dependencies.
+#    Neovim's python3_host_prog points at ~/.virtualenvs/neovim (see nvim options.lua),
+#    so the provider remote plugins (Molten et al.) load from this venv.
+- name: Ensure ~/.virtualenvs directory exists
+  ansible.builtin.file:
+    path: "{{ target_home }}/.virtualenvs"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: "0755"
   become_user: "{{ target_user }}"
-  when: not nvim_env.stat.exists
 
-- name: Update nvim_provider conda env (if exists)
-  ansible.builtin.command:
-    cmd: "{{ target_home }}/miniconda3/bin/conda env update -f {{ target_home }}/dotfiles/conda/nvim_provider.yml --prune"
+- name: Create the Neovim provider venv and install remote-plugin dependencies
+  ansible.builtin.pip:
+    # pynvim and jupyter_client are required; the rest power Molten output rendering.
+    name:
+      - pynvim
+      - jupyter_client
+      - cairosvg
+      - plotly
+      - kaleido
+      - pnglatex
+      - pyperclip
+      - nbformat
+    # Creates the venv with `python3 -m venv` if it does not exist yet, then installs
+    # the packages. Idempotent: pip is a no-op when requirements are already satisfied.
+    virtualenv: "{{ target_home }}/.virtualenvs/neovim"
+    virtualenv_command: python3 -m venv
   become_user: "{{ target_user }}"
-  when: nvim_env.stat.exists
-  changed_when: false
 
-# 7. Initialize Starship in .bashrc (if not already present)
+# 6. Initialize Starship in .bashrc (if not already present)
 - name: Add Starship initialization to .bashrc
   ansible.builtin.lineinfile:
     path: "{{ target_home }}/.bashrc"
@@ -66,17 +76,3 @@
     state: present
     create: yes
   become_user: "{{ target_user }}"
-
-# 8. Initialize Conda for the user shell
-- name: Check if Conda is already initialized in .bashrc
-  ansible.builtin.shell: grep -q "conda initialize" {{ target_home }}/.bashrc
-  register: conda_init_check
-  failed_when: false
-  changed_when: false
-  become_user: "{{ target_user }}"
-
-- name: Run conda init bash
-  ansible.builtin.command:
-    cmd: "{{ target_home }}/miniconda3/bin/conda init bash"
-  become_user: "{{ target_user }}"
-  when: conda_init_check.rc != 0

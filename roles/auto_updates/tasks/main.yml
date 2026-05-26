@@ -1,7 +1,7 @@
 ---
-- name: Install dnf-automatic
+- name: Install dnf5-automatic plugin
   ansible.builtin.dnf:
-    name: dnf-automatic
+    name: dnf5-plugin-automatic
     state: present
 
 - name: Deploy dnf-automatic configuration
@@ -11,10 +11,10 @@
     owner: root
     group: root
     mode: '0644'
-  notify: Restart dnf-automatic
+  notify: Restart dnf5-automatic timer
 
-- name: Ensure dnf-automatic timer is enabled and started
+- name: Ensure dnf5-automatic timer is enabled and started
   ansible.builtin.systemd:
-    name: dnf-automatic.timer
+    name: dnf5-automatic.timer
     state: started
     enabled: true

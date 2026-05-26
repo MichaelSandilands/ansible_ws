@@ -23,7 +23,7 @@
 
     - name: Import Tuxedo Computers GPG key
       ansible.builtin.rpm_key:
-        key: "https://rpm.tuxedocomputers.com/fedora/43/0x54840598.pub.asc"
+        key: "https://rpm.tuxedocomputers.com/fedora/{{ fedora_version }}/0x54840598.pub.asc"
         state: present
 
     - name: Add Docker CE repository
@@ -80,6 +80,9 @@
           - luarocks
           - ImageMagick
           - compat-lua
+          - gcc          # C compiler for nvim-treesitter parser compilation
+          - make         # build step for telescope-fzf-native
+          - wl-clipboard # Wayland clipboard provider (nvim uses clipboard=unnamedplus)
           # Nvidia (Drivers + CUDA for Data Science)
           - akmod-nvidia
           - xorg-x11-drv-nvidia-cuda
