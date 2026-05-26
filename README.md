@@ -1,6 +1,6 @@
 # Fedora Workstation Provisioning
 
-This repository contains Ansible playbooks and roles to automate the setup of a Fedora workstation. It configures system repositories, installs development tools (Docker, Nvidia, R, Miniconda), manages SSH keys, and deploys dotfiles using GNU Stow.
+This repository contains Ansible playbooks and roles to automate the setup of a Fedora workstation. It configures system repositories, installs development tools (Docker, Nvidia), manages SSH keys, and deploys dotfiles using GNU Stow.
 
 ## Quick Start
 

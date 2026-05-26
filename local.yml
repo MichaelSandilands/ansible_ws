@@ -72,7 +72,7 @@
 
     - name: Install System and Dev Packages
       ansible.builtin.dnf:
-        state: latest
+        state: present
         name:
           # Tuxedo Specific
           - tuxedo-control-center
@@ -102,8 +102,6 @@
           - containerd.io
           - docker-buildx-plugin
           - docker-compose-plugin
-          # Python Package Manager
-          - uv
           # Quarto
           - quarto
           # R Core
@@ -169,10 +167,10 @@
     #   register: r_install
     #   changed_when: "'installing' in (r_install.stderr | lower)"
 
-    - name: Install devcontainer CLI globally
-      community.general.npm:
-        name: "@devcontainers/cli"
-        global: true
+    # - name: Install devcontainer CLI globally
+    #   community.general.npm:
+    #     name: "@devcontainers/cli"
+    #     global: true
 
     # ---------------------------------------------------
     # Install & Update Astral's uv
@@ -207,12 +205,6 @@
       changed_when: "'Downloading' in ollama_install.stdout"
 
   roles:
-    # - role: galaxyproject.miniconda
-    #   vars:
-    #     miniconda_prefix: "{{ target_home }}/miniconda3"
-    #     miniconda_manage_dependencies: false
-    #   become_user: "{{ target_user }}"
-
     - role: ssh_keys
       vars:
         ssh_user: "{{ target_user }}"
