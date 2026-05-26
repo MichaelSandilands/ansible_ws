@@ -11,12 +11,6 @@ sudo dnf upgrade -y
 # 1. Install Ansible
 sudo dnf install ansible git -y
 
-# 2. Install Ansible-Galaxy roles
-# This fetches the external dependencies (like Miniconda and Starship)
-curl -L -o temp_requirements.yml "https://raw.githubusercontent.com/MichaelSandilands/ansible_ws/main/requirements.yml"
-ansible-galaxy install -r temp_requirements.yml
-rm temp_requirements.yml
-
 # 3. Provision Machine
 # Pulls this repository and executes the local.yml playbook
 ansible-pull -U "https://github.com/MichaelSandilands/ansible_ws.git" -K
@@ -25,12 +19,6 @@ ansible-pull -U "https://github.com/MichaelSandilands/ansible_ws.git" -K
 Note: You will be prompted for your sudo password (-K) and the Ansible Vault password (configured in ansible.cfg) to decrypt sensitive data like SSH keys.
 
 ## Command Explanations
-
-`ansible-galaxy install`
-
-Installs community-maintained roles on the local system.
-
-- `-r`: Points to a `requirements.yml` file containing the list of external roles to download.
 
 `ansible-pull`
 
@@ -53,6 +41,5 @@ See my [dotfiles repo](https://github.com/MichaelSandilands/dotfiles.git)
 ## Role Overview
 
 - **auto_updates**: Configures `dnf5-automatic` for hands-off system patching.
-- **dotfiles**: Clones your dotfiles repo, uses `stow` for symlinking, and initializes the Starship prompt/Conda shell.
+- **dotfiles**: Clones your dotfiles repo, uses `stow` for symlinking, and initializes the Starship prompt.
 - **ssh_keys**: Securely deploys SSH private/public keys and configurations from encrypted vault files.
-- **External Roles**: Includes `starship` for the shell prompt.

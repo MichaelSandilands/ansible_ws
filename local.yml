@@ -62,6 +62,14 @@
         mode: "0644"
         no_extra_spaces: true
 
+    - name: Enable R, Quarto, Starship Prompt & WezTerm
+      community.general.copr:
+        name:
+          - atim/starship
+          - iucar/rstudio
+          - wez/wezterm
+        state: enabled
+
     - name: Install System and Dev Packages
       ansible.builtin.dnf:
         state: latest
@@ -73,17 +81,19 @@
           # Terminal & Fonts
           - cascadia-mono-nf-fonts
           - kitty
+          - wezterm
           - tmux
+          - starship
           # Neovim & Dependencies
           - neovim
           - python3-neovim
           - luarocks
           - ImageMagick
           - compat-lua
-          - gcc          # C compiler for nvim-treesitter parser compilation
-          - make         # build step for telescope-fzf-native
+          - gcc # C compiler for nvim-treesitter parser compilation
+          - make # build step for telescope-fzf-native
           - wl-clipboard # Wayland clipboard provider (nvim uses clipboard=unnamedplus)
-          # Nvidia (Drivers + CUDA for Data Science)
+          # Nvidia (Drivers + CUDA for LLM & Data Science)
           - akmod-nvidia
           - xorg-x11-drv-nvidia-cuda
           # Docker
@@ -94,6 +104,8 @@
           - docker-compose-plugin
           # Python Package Manager
           - uv
+          # Quarto
+          - quarto
           # R Core
           # - R
           # R: Tidyverse / Dev Dependencies
@@ -162,14 +174,44 @@
         name: "@devcontainers/cli"
         global: true
 
+    # ---------------------------------------------------
+    # Install & Update Astral's uv
+    # ---------------------------------------------------
+    - name: Check if uv is installed
+      ansible.builtin.command: command -v uv
+      become_user: "{{ target_user }}"
+      register: uv_check
+      changed_when: false
+      failed_when: false
+
+    - name: Install uv (if missing)
+      ansible.builtin.shell: "curl -LsSf https://astral.sh/uv/install.sh | sh"
+      become_user: "{{ target_user }}"
+      when: uv_check.rc != 0
+
+    - name: Update uv (if installed)
+      ansible.builtin.command: "{{ target_home }}/.local/bin/uv self update"
+      become_user: "{{ target_user }}"
+      register: uv_update
+      changed_when: "'up to date' not in uv_update.stdout"
+      when: uv_check.rc == 0
+
+    # ---------------------------------------------------
+    # Install & Update Ollama
+    # ---------------------------------------------------
+    - name: Install or Update Ollama
+      ansible.builtin.shell: "curl -fsSL https://ollama.com/install.sh | sh"
+      register: ollama_install
+      # The script outputs "Install complete" even on updates. We mark it changed
+      # only if it actually downloads a new version (you can tweak this logic).
+      changed_when: "'Downloading' in ollama_install.stdout"
+
   roles:
     # - role: galaxyproject.miniconda
     #   vars:
     #     miniconda_prefix: "{{ target_home }}/miniconda3"
     #     miniconda_manage_dependencies: false
     #   become_user: "{{ target_user }}"
-
-    - role: Appsilon.quarto
 
     - role: ssh_keys
       vars:
@@ -183,8 +225,6 @@
           # - name: id_ed25519_ec2
           #   public: id_ed25519_ec2.pub
           #   private: id_ed25519_ec2
-
-    - role: andrewrothstein.starship
 
     - role: dotfiles
 
