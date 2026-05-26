@@ -9,6 +9,16 @@
     fedora_version: "{{ ansible_distribution_major_version }}"
 
   pre_tasks:
+    - name: Enforce execution via Sudo (Prevent native root)
+      ansible.builtin.assert:
+        that:
+          - ansible_env.SUDO_USER is defined
+        fail_msg: >-
+          FATAL: This playbook must be run via sudo by a standard user.
+          Running directly from a native root shell is prohibited to prevent 
+          configurations from being dumped into /root or /home/root.
+        success_msg: "Valid sudo user detected: {{ ansible_env.SUDO_USER }}"
+
     - name: Update all system packages
       ansible.builtin.dnf:
         name: "*"

@@ -4,13 +4,16 @@
     name: dnf5-plugin-automatic
     state: present
 
-- name: Deploy dnf-automatic configuration
+- name: Deploy dnf-automatic configuration to both legacy and DNF5 paths
   ansible.builtin.copy:
     src: automatic.conf
-    dest: /etc/dnf/automatic.conf
+    dest: "{{ item }}"
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
+  loop:
+    - /etc/dnf/automatic.conf
+    - /etc/dnf/dnf5-plugins/automatic.conf
   notify: Restart dnf5-automatic timer
 
 - name: Ensure dnf5-automatic timer is enabled and started
